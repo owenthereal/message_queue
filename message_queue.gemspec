@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = MessageQueue::VERSION
   spec.authors       = ["Jingwen Owen Ou"]
   spec.email         = ["jingweno@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{A command interface to multiple message queues libraries.}
+  spec.summary       = %q{A command interface to multiple message queues libraries.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
