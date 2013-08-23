@@ -1,6 +1,5 @@
 require "bunny"
 require "singleton"
-require_relative "bunny/connection"
 
 module MessageQueue
   module Adapters

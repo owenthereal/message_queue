@@ -1,4 +1,5 @@
 require "message_queue/version"
+require "message_queue/config"
 require "ostruct"
 
 module MessageQueue
@@ -8,7 +9,8 @@ module MessageQueue
 
   def setup(hash_or_file_path)
     if hash_or_file_path.is_a?(String)
-      # load from a file
+      require "yaml"
+      hash_or_file_path = Yaml.load_file(hash_or_file_path)
     end
 
     @config = parse_config(hash_or_file_path)
@@ -16,6 +18,10 @@ module MessageQueue
 
   def config
     @config
+  end
+
+  def adapter
+    @adapter
   end
 
   def load_adapter(name)
@@ -33,11 +39,9 @@ module MessageQueue
   private
 
   def parse_config(opts)
-    adapter = load_adapter(opts[:adapter])
-    raise "Missing adapter #{config[:adapter]}" unless adapter
+    @adapter = load_adapter(opts[:adapter])
+    raise "Missing adapter #{config[:adapter]}" unless @adapter
 
-    adapter.instance.new_config(opts)
+    @adapter.instance.new_config(opts)
   end
 end
-
-require_relative "message_queue/config"
