@@ -9,9 +9,13 @@ class MessageQueueTest < Test::Unit::TestCase
     assert_nil adapter
   end
 
-  def test_setup
-    MessageQueue.setup(:adapter => :bunny,
-                       :url => "amqp://user:pass@host/vhost")
-    assert_equal :bunny, MessageQueue.config.adapter
+  def test_new_connection
+    assert_raises RuntimeError do
+      MessageQueue.new_connection(:adapter => :foo)
+    end
+
+    connection = MessageQueue.new_connection(:adapter => :bunny,
+                                             :uri => "amqp://user:pass@host/vhost")
+    assert_equal "MessageQueue::Adapters::Bunny::Connection", connection.class.to_s
   end
 end

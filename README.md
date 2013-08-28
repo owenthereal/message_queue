@@ -18,7 +18,22 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+connection = MessageQueue.new_connection(:adapter => :bunny,
+                                         :serializer => :message_pack,
+                                         :uri => "amqp://user:pass@host/vhost")
+connection.connect
+
+publisher = connection.new_publisher(opts)
+publisher.publish(data, opts)
+
+consumer = connection.new_consumer(opts)
+consumer.subscribe(opts) do
+  # do stuff
+end
+
+connection.disconnect
+```
 
 ## Contributing
 

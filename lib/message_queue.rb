@@ -1,29 +1,28 @@
 require "message_queue/version"
-require "message_queue/config"
-require "ostruct"
 
 module MessageQueue
   extend self
 
   ADAPTERS = [:bunny]
 
-  def setup(hash_or_file_path)
-    if hash_or_file_path.is_a?(String)
-      require "yaml"
-      hash_or_file_path = Yaml.load_file(hash_or_file_path)
-    end
+  # Public: Initialize a connection to a message queue.
+  #
+  # options - The Hash options used to initialize a connection
+  #           :adapter - The Symbol adapter, currently only :bunny is supported.
+  #           Detailed options see individual adapter implementation.
+  #
+  # Returns the connection for the specified message queue.
+  # Raises a RuntimeError if an adapter can't be found.
+  def new_connection(options)
+    adapter = load_adapter(options[:adapter])
+    raise "Missing adapter #{options[:adapter]}" unless adapter
 
-    @config = parse_config(hash_or_file_path)
+    adapter.instance.new_connection(options)
   end
 
-  def config
-    @config
-  end
-
-  def adapter
-    @adapter
-  end
-
+  # Internal: Load an adapter by name
+  #
+  # Returns the adapter
   def load_adapter(name)
     ADAPTERS.each do |a|
       if a.to_s == name.to_s
@@ -34,14 +33,5 @@ module MessageQueue
     end
 
     nil
-  end
-
-  private
-
-  def parse_config(opts)
-    @adapter = load_adapter(opts[:adapter])
-    raise "Missing adapter #{config[:adapter]}" unless @adapter
-
-    @adapter.instance.new_config(opts)
   end
 end

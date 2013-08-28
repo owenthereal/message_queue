@@ -1,0 +1,2 @@
+adapter: bunny
+url: amqp://user:pass@host/vhost
