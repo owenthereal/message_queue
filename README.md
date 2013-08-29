@@ -1,6 +1,6 @@
 # MessageQueue
 
-TODO: Write a gem description
+A common interface to multiple message queues libraries.
 
 ## Installation
 
@@ -19,20 +19,35 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-connection = MessageQueue.new_connection(:adapter => :bunny,
-                                         :serializer => :message_pack,
-                                         :uri => "amqp://user:pass@host/vhost")
-connection.connect
+MessageQueue.with_connection(:adapter => :bunny, :serializer => :message_pack) do |conn|
+  publisher = conn.new_publisher(
+    :exchange => {
+      :name => "time",
+      :type => :topic
+    },
+    :message => {
+      :routing_key => "time.now"
+    }
+  )
 
-publisher = connection.new_publisher(opts)
-publisher.publish(data, opts)
+  consumer = conn.new_consumer(
+    :queue => {
+      :name => "print_time_now"
+    },
+    :exchange => {
+      :name => "time",
+      :routing_key => "time.#"
+    }
+  )
 
-consumer = connection.new_consumer(opts)
-consumer.subscribe(opts) do
-  # do stuff
+  consumer.subscribe do |delivery_info, metadata, payload|
+    puts "Received message: #{payload}"
+  end
+
+  publisher.publish Time.now.to_s
+
+  sleep 1
 end
-
-connection.disconnect
 ```
 
 ## Contributing

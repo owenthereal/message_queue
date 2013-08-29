@@ -19,6 +19,7 @@ module MessageQueue
 
         # Public: Connect to RabbitMQ
         #
+        # Returns the Bunny instance
         def connect
           @connection ||= begin
                             bunny = ::Bunny.new(settings)
@@ -27,6 +28,9 @@ module MessageQueue
                           end
         end
 
+        # Public: Disconnect from RabbitMQ
+        #
+        # Returns nothing
         def disconnect
           if @connection
             @connection.close if @connection.open?
@@ -34,6 +38,9 @@ module MessageQueue
           end
         end
 
+        # Public: Connect to RabbitMQ, execute the block and disconnect
+        #
+        # Returns nothing
         def with_connection(&block)
           begin
             connect
