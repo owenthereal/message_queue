@@ -19,20 +19,62 @@ class BunnyTest < Test::Unit::TestCase
 
   def test_new_publisher
     connection = MessageQueue::Adapters::Bunny.instance.new_connection
-    connection.connect
+    connection.with_connection do |conn|
+      publisher = conn.new_publisher(
+        :exchange => {
+          :name => "test",
+          :type => :direct
+        },
+        :message => {
+          :routing_key => "test"
+        }
+      )
 
-    publisher = connection.new_publisher(
-      :exchange => {
-        :name => "test",
-        :type => :direct
-      },
-      :message => {
-        :routing_key => "test"
-      }
-    )
+      assert_equal "test", publisher.exchange_name
+      assert_equal :direct, publisher.exchange_type
+      assert_equal "test",  publisher.message_options[:routing_key]
 
-    assert_equal "test", publisher.exchange_name
-    assert_equal :direct, publisher.exchange_type
-    assert_equal "test", publisher.message_routing_key
+      msg = Time.now.to_s
+      publisher.publish msg
+
+      ch = connection.connection.create_channel
+      queue = ch.queue("test")
+      _, _, m = queue.pop
+
+      assert_equal msg, m
+    end
+  end
+
+  def test_new_consumer
+    connection = MessageQueue::Adapters::Bunny.instance.new_connection
+    connection.with_connection do |conn|
+      consumer = conn.new_consumer(
+        :queue => {
+          :name => "test"
+        },
+        :exchange => {
+          :name => "test"
+        }
+      )
+
+      assert_equal "test", consumer.queue_name
+      assert_equal "test", consumer.exchange_name
+
+      publisher = conn.new_publisher(
+        :exchange => {
+          :name => "test",
+          :type => :direct
+        },
+        :message => {
+          :routing_key => "test"
+        }
+      )
+
+      msg = Time.now.to_s
+      publisher.publish msg
+
+      _, _, m = consumer.queue.pop
+      assert_equal msg, m
+    end
   end
 end

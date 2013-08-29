@@ -1,7 +1,6 @@
 require "bunny"
 require "singleton"
 require "message_queue/adapters/bunny/connection"
-require "message_queue/adapters/bunny/publisher"
 
 module MessageQueue
   module Adapters

@@ -1,3 +1,6 @@
+require "message_queue/adapters/bunny/publisher"
+require "message_queue/adapters/bunny/consumer"
+
 module MessageQueue
   module Adapters
     class Bunny
@@ -31,10 +34,25 @@ module MessageQueue
           end
         end
 
+        def with_connection(&block)
+          begin
+            connect
+            block.call(self)
+          ensure
+            disconnect
+          end
+        end
+
         def new_publisher(options)
           raise "No connection to RabbitMQ" unless connection
 
           Publisher.new(self, options)
+        end
+
+        def new_consumer(options)
+          raise "No connection to RabbitMQ" unless connection
+
+          Consumer.new(self, options)
         end
       end
     end

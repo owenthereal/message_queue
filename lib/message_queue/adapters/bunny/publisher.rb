@@ -2,7 +2,9 @@ module MessageQueue
   module Adapters
     class Bunny
       class Publisher
-        attr_reader :connection, :exchange, :exchange_options, :message_options, :exchange_name, :exchange_type, :message_routing_key
+        attr_reader :connection, :exchange
+        attr_reader :exchange_options, :exchange_name, :exchange_type
+        attr_reader :message_options
 
         # Public: Initialize a new Bunny publisher.
         #
@@ -20,16 +22,17 @@ module MessageQueue
         #              Detailed options see
         #              https://github.com/ruby-amqp/bunny/blob/master/lib/bunny/exchange.rb.
         #
-        # Returns a Bunny publisher.
+        # Returns a Publisher.
         def initialize(connection, options = {})
           @connection = connection
 
-          @options = options.dup
-          @exchange_options = @options.fetch(:exchange)
+          options = options.dup
+
+          @exchange_options = options.fetch(:exchange)
           @exchange_name = exchange_options.delete(:name) || (raise "Missing exchange name")
           @exchange_type = exchange_options.delete(:type) || (raise "Missing exchange type")
-          @message_options = @options.fetch(:message)
-          @message_routing_key = message_options.delete(:routing_key) || (raise "Missing message routing key")
+
+          @message_options = options.fetch(:message)
 
           @exchange = connection.connection.default_channel.send(exchange_type, exchange_name, exchange_options)
         end
