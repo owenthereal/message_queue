@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jingweno@gmail.com"]
   spec.description   = %q{A command interface to multiple message queues libraries.}
   spec.summary       = %q{A command interface to multiple message queues libraries.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/jingweno/message_queue"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
