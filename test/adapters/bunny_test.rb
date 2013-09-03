@@ -1,15 +1,17 @@
 require_relative "../test_helper"
+require_relative "../../lib/message_queue/serializers/plain"
 require_relative "../../lib/message_queue/adapters/bunny"
 
 class BunnyTest < Test::Unit::TestCase
   def test_new_connection
-    connection = MessageQueue::Adapters::Bunny.instance.new_connection(
+    connection = MessageQueue::Adapters::Bunny.new_connection(
+      MessageQueue::Serializers::Plain,
       :uri => "amqp://user:pass@host/vhost",
       :tls_certificates => ["path"])
     assert_equal "amqp", connection.settings[:scheme]
     assert_equal ["path"], connection.settings[:tls_certificates]
 
-    connection = MessageQueue::Adapters::Bunny.instance.new_connection
+    connection = MessageQueue::Adapters::Bunny.new_connection MessageQueue::Serializers::Plain
     bunny = connection.connect
     assert bunny.open?
 
@@ -18,7 +20,7 @@ class BunnyTest < Test::Unit::TestCase
   end
 
   def test_new_publisher
-    connection = MessageQueue::Adapters::Bunny.instance.new_connection
+    connection = MessageQueue::Adapters::Bunny.new_connection MessageQueue::Serializers::Plain
     connection.with_connection do |conn|
       publisher = conn.new_publisher(
         :exchange => {
@@ -46,7 +48,7 @@ class BunnyTest < Test::Unit::TestCase
   end
 
   def test_new_consumer
-    connection = MessageQueue::Adapters::Bunny.instance.new_connection
+    connection = MessageQueue::Adapters::Bunny.new_connection MessageQueue::Serializers::Plain
     connection.with_connection do |conn|
       consumer = conn.new_consumer(
         :queue => {

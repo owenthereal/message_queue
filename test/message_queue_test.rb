@@ -9,12 +9,21 @@ class MessageQueueTest < Test::Unit::TestCase
     assert_nil adapter
   end
 
+  def test_load_serializer
+    serializer = MessageQueue.load_serializer(:message_pack)
+    assert_equal "MessageQueue::Serializers::MessagePack", serializer.name
+
+    serializer = MessageQueue.load_serializer(:foo)
+    assert_nil serializer
+  end
+
   def test_new_connection
     assert_raises RuntimeError do
       MessageQueue.new_connection(:adapter => :foo)
     end
 
     connection = MessageQueue.new_connection(:adapter => :bunny,
+                                             :serializer => :message_pack,
                                              :uri => "amqp://user:pass@host/vhost")
     assert_equal "MessageQueue::Adapters::Bunny::Connection", connection.class.to_s
   end
