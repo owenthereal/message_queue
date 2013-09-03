@@ -50,6 +50,10 @@ MessageQueue.with_connection(:adapter => :bunny, :serializer => :message_pack) d
 end
 ```
 
+## Examples
+
+See [examples](https://github.com/jingweno/message_queue/tree/master/examples).
+
 ## Contributing
 
 1. Fork it
