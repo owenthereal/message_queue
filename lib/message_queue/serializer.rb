@@ -13,6 +13,10 @@ module MessageQueue
         def dump(object, options = {})
           instance.dump(object, options)
         end
+
+        def content_type
+          instance.content_type
+        end
       end
     end
   end

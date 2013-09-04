@@ -8,6 +8,10 @@ module MessageQueue
       def dump(object, options = {})
         object
       end
+
+      def content_type
+        "text/plain"
+      end
     end
   end
 end

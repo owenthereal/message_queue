@@ -10,6 +10,10 @@ module MessageQueue
       def dump(object, options = {})
         ::MessagePack.pack(object)
       end
+
+      def content_type
+        "application/x-msgpack"
+      end
     end
   end
 end

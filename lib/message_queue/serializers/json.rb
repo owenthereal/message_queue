@@ -10,6 +10,10 @@ module MessageQueue
       def dump(object, options = {})
         ::MultiJson.dump(object, options)
       end
+
+      def content_type
+        "application/json"
+      end
     end
   end
 end
