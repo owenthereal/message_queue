@@ -5,3 +5,4 @@ gemspec
 
 gem "bunny"
 gem "msgpack"
+gem "multi_json"

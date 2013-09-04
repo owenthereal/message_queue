@@ -6,7 +6,7 @@ module MessageQueue
   extend self
 
   ADAPTERS = [:bunny]
-  SERIALIZERS = [:plain, :message_pack]
+  SERIALIZERS = [:plain, :message_pack, :json]
 
   # Public: Initialize a connection to a message queue.
   #
