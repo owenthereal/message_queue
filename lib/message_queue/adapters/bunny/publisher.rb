@@ -31,7 +31,7 @@ class MessageQueue::Adapters::Bunny::Connection::Publisher
 
     @message_options = options.fetch(:message)
 
-    @exchange = connection.connection.default_channel.send(exchange_type, exchange_name, exchange_options)
+    @exchange = connection.connection.create_channel.send(exchange_type, exchange_name, exchange_options)
   end
 
   def publish(payload, options = {})
