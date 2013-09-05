@@ -1,11 +1,12 @@
 require "message_queue/version"
 require "message_queue/adapter"
+require "message_queue/connection"
 require "message_queue/serializer"
 
 module MessageQueue
   extend self
 
-  ADAPTERS = [:bunny]
+  ADAPTERS = [:memory, :bunny]
   SERIALIZERS = [:plain, :message_pack, :json]
 
   # Public: Initialize a connection to a message queue.

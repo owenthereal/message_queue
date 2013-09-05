@@ -1,7 +1,5 @@
-require "securerandom"
-
-class MessageQueue::Adapters::Bunny::Connection::Publisher
-  attr_reader :connection, :exchange
+class MessageQueue::Adapters::Bunny::Connection::Publisher < MessageQueue::Publisher
+  attr_reader :exchange
   attr_reader :exchange_options, :exchange_name, :exchange_type
   attr_reader :message_options
 
@@ -23,9 +21,7 @@ class MessageQueue::Adapters::Bunny::Connection::Publisher
   #
   # Returns a Publisher.
   def initialize(connection, options = {})
-    @connection = connection
-
-    options = options.dup
+    super
 
     @exchange_options = options.fetch(:exchange)
     @exchange_name = exchange_options.delete(:name) || (raise "Missing exchange name")
@@ -36,9 +32,7 @@ class MessageQueue::Adapters::Bunny::Connection::Publisher
     @exchange = connection.connection.default_channel.send(exchange_type, exchange_name, exchange_options)
   end
 
-  def publish(payload, options = {})
-    serializer = connection.serializer
-    default_options = { :content_type => serializer.content_type, :timestamp => Time.now.utc.to_i, :message_id => SecureRandom.uuid }
-    exchange.publish(serializer.dump(payload), message_options.merge(default_options).merge(options))
+  def publish(object, options = {})
+    exchange.publish(dump_object(object), message_options.merge(default_options).merge(options))
   end
 end

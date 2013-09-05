@@ -10,6 +10,10 @@ module MessageQueue
           instance.new_connection(serializer, options)
         end
       end
+
+      def new_connection(serializer, options = {})
+        Connection.new(serializer, options)
+      end
     end
   end
 end

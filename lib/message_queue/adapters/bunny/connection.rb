@@ -1,18 +1,5 @@
-class MessageQueue::Adapters::Bunny::Connection
-  attr_reader :serializer, :settings, :connection
-
-  # Public: Initialize a new Bunny connection.
-  #
-  # serializer - The Serializer for dumping and loading payload.
-  #
-  # settings   - The Hash settings used to connect with Bunny.
-  #              Details in http://rubybunny.info/articles/connecting.html.
-  #
-  # Returns a Connection wrapper for Bunny.
-  def initialize(serializer, settings)
-    @serializer = serializer
-    @settings = settings
-  end
+class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
+  attr_reader :connection
 
   # Public: Connect to RabbitMQ
   #
@@ -32,18 +19,6 @@ class MessageQueue::Adapters::Bunny::Connection
     if @connection
       @connection.close if @connection.open?
       @connection = nil
-    end
-  end
-
-  # Public: Connect to RabbitMQ, execute the block and disconnect
-  #
-  # Returns nothing
-  def with_connection(&block)
-    begin
-      connect
-      block.call(self)
-    ensure
-      disconnect
     end
   end
 

@@ -1,5 +1,4 @@
-class MessageQueue::Adapters::Bunny::Connection::Consumer
-  attr_reader :connection
+class MessageQueue::Adapters::Bunny::Connection::Consumer < MessageQueue::Consumer
   attr_reader :queue_options, :queue_name
   attr_reader :exchange_options, :exchange_name, :exchange_routing_key
   attr_reader :subscribe_options
@@ -25,9 +24,7 @@ class MessageQueue::Adapters::Bunny::Connection::Consumer
   #
   # Returns a Consumer.
   def initialize(connection, options = {})
-    @connection = connection
-
-    options = options.dup
+    super
 
     @queue_options = options.fetch(:queue)
     @queue_name = queue_options.delete(:name) || (raise "Missing queue name")
@@ -41,11 +38,11 @@ class MessageQueue::Adapters::Bunny::Connection::Consumer
 
   def subscribe(options = {}, &block)
     @subscription = queue.subscribe(subscribe_options.merge(options)) do |delivery_info, metadata, payload|
-      block.call(delivery_info, metadata, connection.serializer.load(payload))
+      block.call(delivery_info, metadata, load_object(payload))
     end
   end
 
-  def unsubscribe
+  def unsubscribe(options = {})
     @subscription.cancel if @subscription
   end
 
