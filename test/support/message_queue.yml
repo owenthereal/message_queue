@@ -1,2 +1,3 @@
 adapter: bunny
+serializer: json
 url: amqp://user:pass@host/vhost

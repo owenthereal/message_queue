@@ -27,4 +27,16 @@ class MessageQueueTest < Test::Unit::TestCase
                                              :uri => "amqp://user:pass@host/vhost")
     assert_equal "MessageQueue::Adapters::Bunny::Connection", connection.class.to_s
   end
+
+  def test_connect_and_disconnect
+    config_file = File.join File.expand_path(File.dirname(__FILE__)), "support", "message_queue.yml"
+    MessageQueue.connect(config_file)
+    connection = MessageQueue.connection
+
+    assert_equal "MessageQueue::Adapters::Bunny::Connection", connection.class.to_s
+
+    result = MessageQueue.disconnect
+    assert result
+    assert_nil MessageQueue.connection
+  end
 end

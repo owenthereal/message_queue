@@ -6,8 +6,43 @@ require "message_queue/serializer"
 module MessageQueue
   extend self
 
+  attr_reader :connection
+
   ADAPTERS = [:memory, :bunny]
   SERIALIZERS = [:plain, :message_pack, :json]
+
+  # Public: Connect to the message queue.
+  #
+  # It either reads options from a Hash or the path to the Yaml settings file.
+  # After connecting, it stores the connection instance locally.
+  #
+  # file_or_options - The Hash options or the String Yaml settings file
+  #                   Detail Hash options see the new_connection method.
+  #
+  # Returns the connection for the specified message queue.
+  # Raises a RuntimeError if an adapter can't be found.
+  def connect(file_or_options = {})
+    file_or_options = if file_or_options.is_a?(String)
+                        require "yaml"
+                        YAML.load_file(file_or_options).inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+                      end
+    @connection ||= new_connection(file_or_options)
+  end
+
+  # Public: Disconnect from the message queue if it's connected
+  #
+  # It clears out the stored connection.
+  #
+  # Returns true if it disconnects successfully
+  def disconnect
+    if @connection
+      @connection.disconnect
+      @connection = nil
+      return true
+    end
+
+    false
+  end
 
   # Public: Initialize a connection to a message queue.
   #
