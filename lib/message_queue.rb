@@ -22,10 +22,11 @@ module MessageQueue
   # Returns the connection for the specified message queue.
   # Raises a RuntimeError if an adapter can't be found.
   def connect(file_or_options = {})
-    file_or_options = if file_or_options.is_a?(String)
-                        require "yaml"
-                        YAML.load_file(file_or_options).inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
-                      end
+    if file_or_options.is_a?(String)
+      require "yaml"
+      file_or_options = YAML.load_file(file_or_options).inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+    end
+
     @connection ||= new_connection(file_or_options)
     @connection.connect
   end
