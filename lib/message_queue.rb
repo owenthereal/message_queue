@@ -115,3 +115,5 @@ module MessageQueue
     name.to_s.split("_").map(&:capitalize) * ""
   end
 end
+
+require "message_queue/rails" if defined?(::Rails::Engine)
