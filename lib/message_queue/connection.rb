@@ -26,6 +26,13 @@ class MessageQueue::Connection
   def disconnect
   end
 
+  # Public: Check if it's connected to the message queue
+  #
+  # Returns true if it's connected
+  def connected?
+    false
+  end
+
   # Public: Connect to the message, execute the block and disconnect
   #
   # Returns nothing

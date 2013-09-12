@@ -27,6 +27,7 @@ module MessageQueue
                         YAML.load_file(file_or_options).inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
                       end
     @connection ||= new_connection(file_or_options)
+    @connection.connect
   end
 
   # Public: Disconnect from the message queue if it's connected
@@ -42,6 +43,13 @@ module MessageQueue
     end
 
     false
+  end
+
+  # Public: Check if it's connected to the message queue
+  #
+  # Returns true if it's connected
+  def connected?
+    connection.connected? if connection
   end
 
   # Public: Initialize a connection to a message queue.
@@ -76,6 +84,24 @@ module MessageQueue
   def with_connection(options = {}, &block)
     connection = new_connection(options)
     connection.with_connection(&block)
+  end
+
+  # Public: Initialize a publisher using current connection to a message queue.
+  #
+  # Details options see a particular adapter.
+  #
+  # Returns a new publisher
+  def new_publisher(options = {})
+    connection.new_publisher(options)
+  end
+
+  # Public: Initialize a consumer using current connection to a message queue.
+  #
+  # Details options see a particular adapter.
+  #
+  # Returns a new consumer
+  def new_consumer(options = {})
+    connection.new_consumer(options)
   end
 
   # Internal: Load an adapter by name

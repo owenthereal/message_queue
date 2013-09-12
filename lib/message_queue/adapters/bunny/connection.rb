@@ -22,14 +22,21 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
     end
   end
 
+  # Public: Check if it's connected to the message queue
+  #
+  # Returns true if it's connected
+  def connected?
+    @connection.open? if @connection
+  end
+
   def new_publisher(options)
-    raise "No connection to RabbitMQ" unless connection
+    raise "No connection to RabbitMQ" unless connection && connected?
 
     Publisher.new(self, options)
   end
 
   def new_consumer(options)
-    raise "No connection to RabbitMQ" unless connection
+    raise "No connection to RabbitMQ" unless connection && connected?
 
     Consumer.new(self, options)
   end

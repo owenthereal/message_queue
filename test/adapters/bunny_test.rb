@@ -12,11 +12,11 @@ class BunnyTest < Test::Unit::TestCase
     assert_equal ["path"], connection.settings[:tls_certificates]
 
     connection = MessageQueue::Adapters::Bunny.new_connection MessageQueue::Serializers::Plain
-    bunny = connection.connect
-    assert bunny.open?
+    connection.connect
+    assert connection.connected?
 
     connection.disconnect
-    assert bunny.closed?
+    assert !connection.connected?
   end
 
   def test_new_publisher

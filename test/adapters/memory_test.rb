@@ -3,6 +3,11 @@ require_relative "../../lib/message_queue/serializers/plain"
 require_relative "../../lib/message_queue/adapters/memory"
 
 class MemoryTest < Test::Unit::TestCase
+  def test_connected?
+    connection = MessageQueue::Adapters::Memory.new_connection MessageQueue::Serializers::Plain
+    assert !connection.connected?
+  end
+
   def test_pub_sub
     connection = MessageQueue::Adapters::Memory.new_connection MessageQueue::Serializers::Plain
     connection.with_connection do |conn|
