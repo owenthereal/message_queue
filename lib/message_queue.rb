@@ -6,7 +6,7 @@ require "message_queue/serializer"
 module MessageQueue
   extend self
 
-  attr_reader :connection
+  attr_reader :connection, :settings
 
   ADAPTERS = [:memory, :bunny]
   SERIALIZERS = [:plain, :message_pack, :json]
@@ -27,7 +27,8 @@ module MessageQueue
       file_or_options = YAML.load_file(file_or_options).inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
 
-    @connection ||= new_connection(file_or_options)
+    @settings = file_or_options
+    @connection = new_connection(@settings)
     @connection.connect
   end
 
@@ -44,6 +45,14 @@ module MessageQueue
     end
 
     false
+  end
+
+  # Public: Reconnect to the message queue if it's disconnected by using the previous connection settings
+  #
+  # Returns the new connection if it reconnects successfully
+  def reconnect
+    disconnect if connected?
+    connect(settings)
   end
 
   # Public: Check if it's connected to the message queue
