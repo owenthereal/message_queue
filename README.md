@@ -26,7 +26,7 @@ disconnects.
 
 ```ruby
 MessageQueue.with_connection(:adapter => :bunny, :serializer => :message_pack) do |conn|
-  publisher = conn.new_publisher(
+  producer = conn.new_producer(
     :exchange => {
       :name => "time",
       :type => :topic
@@ -50,7 +50,7 @@ MessageQueue.with_connection(:adapter => :bunny, :serializer => :message_pack) d
     puts "Received message: #{payload}"
   end
 
-  publisher.publish Time.now.to_s
+  producer.publish Time.now.to_s
 
   sleep 1
 end
@@ -63,7 +63,7 @@ You could maintain a global connection by using the `connect` method on
 MessageQueue.connect(:adater => :bunny, :serializer => :json)
 puts MessageQueue.connected? # => true
 
-publisher = MessageQueue.new_publisher(
+producer = MessageQueue.new_producer(
   :exchange => {
     :name => "time",
     :type => :topic
@@ -87,7 +87,7 @@ consumer.subscribe do |delivery_info, metadata, payload|
   puts "Received message: #{payload}"
 end
 
-publisher.publish Time.now.to_s
+producer.publish Time.now.to_s
 
 sleep 1
 

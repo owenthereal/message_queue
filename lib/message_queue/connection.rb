@@ -45,8 +45,8 @@ class MessageQueue::Connection
     end
   end
 
-  def new_publisher(options = {})
-    Publisher.new(self, options)
+  def new_producer(options = {})
+    Producer.new(self, options)
   end
 
   def new_consumer(options = {})
@@ -54,5 +54,5 @@ class MessageQueue::Connection
   end
 end
 
-require "message_queue/publisher"
+require "message_queue/producer"
 require "message_queue/consumer"

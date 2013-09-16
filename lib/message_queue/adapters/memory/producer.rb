@@ -1,6 +1,6 @@
 require "observer"
 
-class MessageQueue::Adapters::Memory::Connection::Publisher < MessageQueue::Publisher
+class MessageQueue::Adapters::Memory::Connection::Producer < MessageQueue::Producer
   include Observable
 
   def publish(object, options = {})

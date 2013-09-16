@@ -96,13 +96,13 @@ module MessageQueue
     connection.with_connection(&block)
   end
 
-  # Public: Initialize a publisher using current connection to a message queue.
+  # Public: Initialize a producer using current connection to a message queue.
   #
   # Details options see a particular adapter.
   #
-  # Returns a new publisher
-  def new_publisher(options = {})
-    connection.new_publisher(options)
+  # Returns a new producer
+  def new_producer(options = {})
+    connection.new_producer(options)
   end
 
   # Public: Initialize a consumer using current connection to a message queue.

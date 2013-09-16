@@ -1,15 +1,16 @@
 require_relative "../lib/message_queue"
 
 MessageQueue.with_connection(:adapter => :bunny, :serializer => :message_pack) do |conn|
-  publisher = conn.new_publisher(
+  producer = conn.new_producer(
     :exchange => {
       :name => "time",
       :type => :topic
     },
     :message => {
-      :routing_key => "time.now"
+      :routing_key => "time.now",
+      :mandatory => true
     }
   )
 
-  publisher.publish Time.now.to_s
+  producer.publish Time.now.to_s
 end

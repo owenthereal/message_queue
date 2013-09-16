@@ -19,10 +19,10 @@ class BunnyTest < Test::Unit::TestCase
     assert !connection.connected?
   end
 
-  def test_new_publisher
+  def test_new_producer
     connection = MessageQueue::Adapters::Bunny.new_connection MessageQueue::Serializers::Plain
     connection.with_connection do |conn|
-      publisher = conn.new_publisher(
+      producer = conn.new_producer(
         :exchange => {
           :name => "test",
           :type => :direct
@@ -32,12 +32,12 @@ class BunnyTest < Test::Unit::TestCase
         }
       )
 
-      assert_equal "test", publisher.exchange_name
-      assert_equal :direct, publisher.exchange_type
-      assert_equal "test",  publisher.message_options[:routing_key]
+      assert_equal "test", producer.exchange_name
+      assert_equal :direct, producer.exchange_type
+      assert_equal "test",  producer.message_options[:routing_key]
 
       msg = Time.now.to_s
-      publisher.publish msg
+      producer.publish msg
 
       ch = connection.connection.create_channel
       queue = ch.queue("test")
@@ -62,7 +62,7 @@ class BunnyTest < Test::Unit::TestCase
       assert_equal "test", consumer.queue_name
       assert_equal "test", consumer.exchange_name
 
-      publisher = conn.new_publisher(
+      producer = conn.new_producer(
         :exchange => {
           :name => "test",
           :type => :direct
@@ -73,7 +73,7 @@ class BunnyTest < Test::Unit::TestCase
       )
 
       msg = Time.now.to_s
-      publisher.publish msg
+      producer.publish msg
 
       _, _, m = consumer.queue.pop
       assert_equal msg, m

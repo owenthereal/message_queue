@@ -11,12 +11,12 @@ class MemoryTest < Test::Unit::TestCase
   def test_pub_sub
     connection = MessageQueue::Adapters::Memory.new_connection MessageQueue::Serializers::Plain
     connection.with_connection do |conn|
-      publisher = conn.new_publisher
+      producer = conn.new_producer
       consumer = conn.new_consumer
-      consumer.subscribe(:publisher => publisher)
+      consumer.subscribe(:producer => producer)
 
       msg = Time.now.to_s
-      publisher.publish msg, :type => :time
+      producer.publish msg, :type => :time
 
       options, payload = consumer.queue.pop
       assert_equal :time, options[:type]

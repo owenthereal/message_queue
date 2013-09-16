@@ -29,10 +29,10 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
     @connection.open? if @connection
   end
 
-  def new_publisher(options)
+  def new_producer(options)
     raise "No connection to RabbitMQ" unless connection && connected?
 
-    Publisher.new(self, options)
+    Producer.new(self, options)
   end
 
   def new_consumer(options)
@@ -42,5 +42,5 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
   end
 end
 
-require "message_queue/adapters/bunny/publisher"
+require "message_queue/adapters/bunny/producer"
 require "message_queue/adapters/bunny/consumer"

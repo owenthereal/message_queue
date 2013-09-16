@@ -1,13 +1,13 @@
-class MessageQueue::Adapters::Bunny::Connection::Publisher < MessageQueue::Publisher
+class MessageQueue::Adapters::Bunny::Connection::Producer < MessageQueue::Producer
   attr_reader :exchange
   attr_reader :exchange_options, :exchange_name, :exchange_type
   attr_reader :message_options
 
-  # Public: Initialize a new Bunny publisher.
+  # Public: Initialize a new Bunny producer.
   #
   # connection - The Bunny Connection.
   # options    - The Hash options used to initialize the exchange
-  #              of a publisher:
+  #              of a producer:
   #              :exchange -
   #                 :name    - The String exchange name.
   #                 :type    - The Symbol exchange type.

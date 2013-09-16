@@ -7,14 +7,14 @@ class MessageQueue::Adapters::Memory::Connection::Consumer < MessageQueue::Consu
   end
 
   def subscribe(options = {}, &block)
-    publisher = options.fetch(:publisher)
-    publisher.add_observer(self)
+    producer = options.fetch(:producer)
+    producer.add_observer(self)
     @block = block
   end
 
   def unsubscribe(options = {})
-    publisher = options.fetch(:publisher)
-    publisher.delete_observer(self)
+    producer = options.fetch(:producer)
+    producer.delete_observer(self)
     @block = nil
   end
 
