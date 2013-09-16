@@ -152,4 +152,5 @@ module MessageQueue
   end
 end
 
+require "message_queue/producible"
 require "message_queue/rails" if defined?(::Rails::Engine)

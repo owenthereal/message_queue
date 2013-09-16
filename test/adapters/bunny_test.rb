@@ -24,23 +24,23 @@ class BunnyTest < Test::Unit::TestCase
     connection.with_connection do |conn|
       producer = conn.new_producer(
         :exchange => {
-          :name => "test",
+          :name => "test_producer",
           :type => :direct
         },
         :message => {
-          :routing_key => "test"
+          :routing_key => "test_producer"
         }
       )
 
-      assert_equal "test", producer.exchange_name
+      assert_equal "test_producer", producer.exchange_name
       assert_equal :direct, producer.exchange_type
-      assert_equal "test",  producer.message_options[:routing_key]
+      assert_equal "test_producer",  producer.message_options[:routing_key]
 
       msg = Time.now.to_s
       producer.publish msg
 
       ch = connection.connection.create_channel
-      queue = ch.queue("test")
+      queue = ch.queue("test_producer").bind("test_producer", :routing_key => "test_producer")
       _, _, m = queue.pop
 
       assert_equal msg, m
@@ -52,23 +52,23 @@ class BunnyTest < Test::Unit::TestCase
     connection.with_connection do |conn|
       consumer = conn.new_consumer(
         :queue => {
-          :name => "test"
+          :name => "test_consumer"
         },
         :exchange => {
-          :name => "test"
+          :name => "test_consumer"
         }
       )
 
-      assert_equal "test", consumer.queue_name
-      assert_equal "test", consumer.exchange_name
+      assert_equal "test_consumer", consumer.queue_name
+      assert_equal "test_consumer", consumer.exchange_name
 
       producer = conn.new_producer(
         :exchange => {
-          :name => "test",
+          :name => "test_consumer",
           :type => :direct
         },
         :message => {
-          :routing_key => "test"
+          :routing_key => "test_consumer"
         }
       )
 
