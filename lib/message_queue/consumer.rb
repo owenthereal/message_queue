@@ -3,7 +3,7 @@ class MessageQueue::Consumer
 
   def initialize(connection, options = {})
     @connection = connection
-    @options = options.dup
+    @options = Marshal.load(Marshal.dump(options)) # deep cloning options
   end
 
   def load_object(object)
