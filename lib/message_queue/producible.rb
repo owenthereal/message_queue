@@ -1,4 +1,12 @@
 module MessageQueue
+  # class Producer
+  #   include MessageQueue::Producible
+  #
+  #   exchange :name => "time" :type => :topic
+  #   message :routing_key => "time.now", :mandatory => true
+  # end
+  #
+  # Producer.new.publish(Time.now.to_s)
   module Producible
     def self.included(base)
       base.extend(ClassMethods)
