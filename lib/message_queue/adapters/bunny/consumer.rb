@@ -26,14 +26,14 @@ class MessageQueue::Adapters::Bunny::Connection::Consumer < MessageQueue::Consum
   def initialize(connection, options = {})
     super
 
-    @queue_options = options.fetch(:queue)
+    @queue_options = self.options.fetch(:queue)
     @queue_name = queue_options.delete(:name) || (raise "Missing queue name")
 
-    @exchange_options = options.fetch(:exchange)
+    @exchange_options = self.options.fetch(:exchange)
     @exchange_name = exchange_options.delete(:name) || (raise "Missing exchange name")
     @exchange_routing_key = exchange_options.delete(:routing_key) || queue_name
 
-    @subscribe_options = options.fetch(:subscribe, {})
+    @subscribe_options = self.options.fetch(:subscribe, {})
   end
 
   def subscribe(options = {}, &block)
