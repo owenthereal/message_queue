@@ -18,9 +18,9 @@ class MemoryTest < Test::Unit::TestCase
       msg = Time.now.to_s
       producer.publish msg, :type => :time
 
-      options, payload = consumer.queue.pop
-      assert_equal :time, options[:type]
-      assert_equal msg, payload
+      message = consumer.queue.pop
+      assert_equal :time, message.type
+      assert_equal msg, message.payload
     end
   end
 end

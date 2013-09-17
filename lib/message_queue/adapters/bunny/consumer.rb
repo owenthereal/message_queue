@@ -38,7 +38,11 @@ class MessageQueue::Adapters::Bunny::Connection::Consumer < MessageQueue::Consum
 
   def subscribe(options = {}, &block)
     @subscription = queue.subscribe(subscribe_options.merge(options)) do |delivery_info, metadata, payload|
-      block.call(delivery_info, metadata, load_object(payload))
+      message = MessageQueue::Message.new(:message_id => metadata[:message_id],
+                                          :type => metadata[:type],
+                                          :timestamp => metadata[:timestamp],
+                                          :payload => load_object(payload))
+      block.call(message)
     end
   end
 

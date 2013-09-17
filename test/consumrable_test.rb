@@ -2,6 +2,8 @@ require_relative "test_helper"
 
 class ConsumableTest < Test::Unit::TestCase
   class Consumer
+    attr_reader :message
+
     include MessageQueue::Consumable
   end
 
@@ -28,12 +30,16 @@ class ConsumableTest < Test::Unit::TestCase
 
     Consumer.queue :name => "test_consumable"
     Consumer.exchange :name => "test_consumable"
-    Consumer.send(:define_method, :process) do |drgselivery_info, metadata, payload|
-      assert_equal msg, payload
+    Consumer.send(:define_method, :process) do |message|
+      @message = message
     end
     consumer = Consumer.new
     consumer.subscribe
 
     producer.publish msg
+
+    sleep 0.5
+
+    assert_equal msg, consumer.message.payload
   end
 end

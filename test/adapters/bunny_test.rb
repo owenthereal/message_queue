@@ -73,7 +73,7 @@ class BunnyTest < Test::Unit::TestCase
       )
 
       msg = Time.now.to_s
-      producer.publish msg
+      producer.publish msg, :type => :foo
 
       _, _, m = consumer.queue.pop
       assert_equal msg, m

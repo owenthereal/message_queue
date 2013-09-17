@@ -2,6 +2,9 @@ require "message_queue/version"
 require "message_queue/adapter"
 require "message_queue/connection"
 require "message_queue/serializer"
+require "message_queue/message"
+require "message_queue/logging"
+require "message_queue/error_handlers/logger"
 
 module MessageQueue
   extend self
@@ -112,6 +115,31 @@ module MessageQueue
   # Returns a new consumer
   def new_consumer(options = {})
     connection.new_consumer(options)
+  end
+
+  def logger
+    Logging.logger
+  end
+
+  # Internal: Register a consumable.
+  #
+  # Returns the registered consumables.
+  def register_consumable(consumable)
+    consumables << consumable
+  end
+
+  # Internal: Get the list of error handlers.
+  #
+  # Returns the list of error handlers.
+  def error_handlers
+    @error_handlers ||= [ MessageQueue::ErrorHandlers::Logger.new ]
+  end
+
+  # Internal: Get the list of consumables.
+  #
+  # Returns the list of consumables.
+  def consumables
+    @consumables ||= []
   end
 
   # Internal: Load an adapter by name

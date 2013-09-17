@@ -12,6 +12,7 @@ module MessageQueue
   module Consumable
     def self.included(base)
       base.extend(ClassMethods)
+      MessageQueue.register_consumable(base)
     end
 
     module ClassMethods
@@ -45,8 +46,20 @@ module MessageQueue
       consumer = MessageQueue.new_consumer(:queue => self.class.queue_options,
                                            :exchange => self.class.exchange_options,
                                            :subscribe => self.class.subscribe_options)
-      consumer.subscribe(options) do |*args|
-        process(*args)
+      consumer.subscribe(options) do |message|
+        begin
+          process(message)
+        rescue StandardError => ex
+          handle_error(message.message_id, consumer, ex)
+        end
+      end
+    end
+
+    private
+
+    def handle_error(message_id, consumer, ex)
+      MessageQueue.error_handlers.each do |handler|
+        handler.handle(message_id, consumer, ex)
       end
     end
   end
