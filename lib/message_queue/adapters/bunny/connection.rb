@@ -6,6 +6,7 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
   # Returns the Bunny instance
   def connect
     @connection ||= begin
+                      super
                       bunny = ::Bunny.new(settings)
                       bunny.start
                       bunny
@@ -17,6 +18,7 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
   # Returns nothing
   def disconnect
     if @connection
+      super
       @connection.close if @connection.open?
       @connection = nil
     end

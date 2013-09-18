@@ -24,7 +24,7 @@ module MessageQueue
     end
 
     def logger
-      self.class.logger
+      Logging.logger
     end
   end
 end

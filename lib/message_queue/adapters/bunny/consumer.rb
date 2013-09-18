@@ -41,6 +41,7 @@ class MessageQueue::Adapters::Bunny::Connection::Consumer < MessageQueue::Consum
       message = MessageQueue::Message.new(:message_id => metadata[:message_id],
                                           :type => metadata[:type],
                                           :timestamp => metadata[:timestamp],
+                                          :routing_key => delivery_info[:routing_key],
                                           :payload => load_object(payload))
       block.call(message)
     end

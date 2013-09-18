@@ -1,5 +1,7 @@
 module MessageQueue
   def self.hook_rails!
+    MessageQueue::Logging.logger = ::Rails.logger
+
     config_file = ::Rails.root.join("config", "message_queue.yml")
     config = if config_file.exist?
                HashWithIndifferentAccess.new YAML.load_file(config_file)[::Rails.env]

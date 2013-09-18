@@ -19,10 +19,11 @@ class MessageQueue::Adapters::Memory::Connection::Consumer < MessageQueue::Consu
   end
 
   def update(object, options)
-    options, object = options, load_object(object)
+    object = load_object(object)
     message = MessageQueue::Message.new(:message_id => options[:message_id],
                                         :type => options[:type],
                                         :timestamp => options[:timestamp],
+                                        :routing_key => options[:routing_key],
                                         :payload => load_object(object))
     if block
       block.call(message)

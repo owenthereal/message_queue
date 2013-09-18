@@ -33,6 +33,8 @@ class MessageQueue::Adapters::Bunny::Connection::Producer < MessageQueue::Produc
   end
 
   def publish(object, options = {})
-    exchange.publish(dump_object(object), message_options.merge(default_options).merge(options))
+    options = message_options.merge(default_options).merge(options)
+    object = dump_object(object)
+    exchange.publish(object, options)
   end
 end

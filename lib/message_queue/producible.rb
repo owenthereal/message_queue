@@ -8,6 +8,8 @@ module MessageQueue
   #
   # Producer.new.publish(Time.now.to_s)
   module Producible
+    include Logging
+
     def self.included(base)
       base.extend(ClassMethods)
     end
@@ -31,6 +33,8 @@ module MessageQueue
     end
 
     def publish(object, options = {})
+      logger.info "publishing #{object.inspect} with options #{options.inspect}"
+
       producer = MessageQueue.new_producer(:exchange => self.class.exchange_options, :message => self.class.message_options)
       producer.publish(object, options)
     end

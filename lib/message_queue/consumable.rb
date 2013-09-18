@@ -5,11 +5,13 @@ module MessageQueue
   #   queue :name => "print_time_now"
   #   exchange :name => "time", routing_key => "time.#"
   #
-  #   def process(*args)
+  #   def process(message)
   #     ...
   #   end
   # end
   module Consumable
+    include Logging
+
     def self.included(base)
       base.extend(ClassMethods)
       MessageQueue.register_consumable(base)
@@ -48,6 +50,10 @@ module MessageQueue
                                            :subscribe => self.class.subscribe_options)
       consumer.subscribe(options) do |message|
         begin
+          logger.info("message(#{message.message_id || '-'}): " +
+                      "routing key: #{message.routing_key}, " +
+                      "consumer: #{consumer.class}, " +
+                      "payload: #{message.payload}")
           process(message)
         rescue StandardError => ex
           handle_error(message, consumer, ex)

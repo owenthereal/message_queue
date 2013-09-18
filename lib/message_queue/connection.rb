@@ -1,4 +1,8 @@
+require "message_queue/logging"
+
 class MessageQueue::Connection
+  include MessageQueue::Logging
+
   attr_reader :serializer, :settings
 
   # Public: Initialize a new Bunny connection.
@@ -18,12 +22,14 @@ class MessageQueue::Connection
   #
   # Returns nothing
   def connect
+    logger.info("connecting with adapter #{self.class} and settings #{settings}")
   end
 
   # Public: Disconnect from the message queue
   #
   # Returns nothing
   def disconnect
+    logger.info("disconnecting")
   end
 
   # Public: Check if it's connected to the message queue
