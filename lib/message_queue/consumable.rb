@@ -50,16 +50,16 @@ module MessageQueue
         begin
           process(message)
         rescue StandardError => ex
-          handle_error(message.message_id, consumer, ex)
+          handle_error(message, consumer, ex)
         end
       end
     end
 
     private
 
-    def handle_error(message_id, consumer, ex)
+    def handle_error(message, consumer, ex)
       MessageQueue.error_handlers.each do |handler|
-        handler.handle(message_id, consumer, ex)
+        handler.handle(message, consumer, ex)
       end
     end
   end

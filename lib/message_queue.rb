@@ -4,7 +4,6 @@ require "message_queue/connection"
 require "message_queue/serializer"
 require "message_queue/message"
 require "message_queue/logging"
-require "message_queue/error_handlers/logger"
 
 module MessageQueue
   extend self
@@ -128,11 +127,18 @@ module MessageQueue
     consumables << consumable
   end
 
+  # Internal: Register a error handler.
+  #
+  # Returns the registered error handlers.
+  def register_error_handler(error_handler)
+    error_handlers << error_handler
+  end
+
   # Internal: Get the list of error handlers.
   #
   # Returns the list of error handlers.
   def error_handlers
-    @error_handlers ||= [ MessageQueue::ErrorHandlers::Logger.new ]
+    @error_handlers ||= []
   end
 
   # Internal: Get the list of consumables.
@@ -182,4 +188,6 @@ end
 
 require "message_queue/producible"
 require "message_queue/consumable"
+require "message_queue/error_handlers/logger"
+require "message_queue/error_handlers/airbrake"
 require "message_queue/rails" if defined?(::Rails::Engine)
