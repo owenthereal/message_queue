@@ -1,6 +1,10 @@
+require "message_queue/logging"
+
 module MessageQueue
+  # A module to mix in a consumer class, for example:
+  #
   # class Consumer
-  #   include MessageQueue::Consumerable
+  #   include MessageQueue::Consumable
   #
   #   queue :name => "print_time_now"
   #   exchange :name => "time", routing_key => "time.#"
@@ -9,6 +13,9 @@ module MessageQueue
   #     ...
   #   end
   # end
+  #
+  # The consumer class needs to implement the process method which will be passed
+  # a MessageQueue::Message instance when it receives a message.
   module Consumable
     include Logging
 
@@ -29,7 +36,6 @@ module MessageQueue
       def subscribe(options = {})
         subscribe_options.merge!(options)
       end
-
 
       def queue_options
         @queue_options ||= {}

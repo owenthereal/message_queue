@@ -1,4 +1,8 @@
+require "message_queue/logging"
+
 module MessageQueue
+  # A module to mix in a producer class, for example:
+  #
   # class Producer
   #   include MessageQueue::Producible
   #
