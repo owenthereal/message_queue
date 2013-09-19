@@ -1,20 +1,21 @@
 module MessageQueue
-  class Consumers
+  class ConsumableRunner
     attr_reader :consumables
 
     def initialize(consumables)
       @consumables = consumables
     end
 
-    def run
+    def run(options = {})
+      block = !!options[:block]
       consumables.each_with_index do |consumable, index|
         # Blocks the last consumer
         opts = if index < consumables.size - 1
                  {}
                else
-                 { :block => true }
+                 { :block => block }
                end
-        consumable.subscribe(opts)
+        consumable.new.subscribe(opts)
       end
     end
   end

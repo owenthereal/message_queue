@@ -6,7 +6,7 @@ module MessageQueue
   # class Producer
   #   include MessageQueue::Producible
   #
-  #   exchange :name => "time" :type => :topic
+  #   exchange :name => "time", :type => :topic
   #   message :routing_key => "time.now", :mandatory => true
   # end
   #

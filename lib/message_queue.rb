@@ -120,6 +120,10 @@ module MessageQueue
     Logging.logger
   end
 
+  def run_consumables(options = {})
+    MessageQueue::ConsumableRunner.new(consumables).run(options)
+  end
+
   # Internal: Register a consumable.
   #
   # Returns the registered consumables.
@@ -188,6 +192,7 @@ end
 
 require "message_queue/producible"
 require "message_queue/consumable"
+require "message_queue/consumable_runner"
 require "message_queue/error_handlers/logger"
 require "message_queue/error_handlers/airbrake"
 require "message_queue/rails" if defined?(::Rails::Engine)

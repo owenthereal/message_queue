@@ -7,7 +7,7 @@ module MessageQueue
   #   include MessageQueue::Consumable
   #
   #   queue :name => "print_time_now"
-  #   exchange :name => "time", routing_key => "time.#"
+  #   exchange :name => "time", :routing_key => "time.#"
   #
   #   def process(message)
   #     ...

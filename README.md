@@ -96,7 +96,7 @@ puts MessageQueue.connected? # => false
 ```
 
 You could also mix in the `MessageQueue::Producible` module and the
-`MessageQueue::Consumable` module in your producer class and consumer
+`MessageQueue::Consumable` module to your producer class and consumer
 class respectively. The consumer class needs to implement a `process`
 method which will be passed a `MessageQueue::Message` instance when it
 receives a message.
@@ -105,7 +105,7 @@ receives a message.
 class Producer
   include MessageQueue::Producible
 
-  exchange :name => "time" :type => :topic
+  exchange :name => "time", :type => :topic
   message :routing_key => "time.now", :mandatory => true
 end
 
@@ -113,7 +113,7 @@ class Consumer
   include MessageQueue::Consumable
 
   queue :name => "print_time_now"
-  exchange :name => "time", routing_key => "time.#"
+  exchange :name => "time", :routing_key => "time.#"
 
   def process(message)
     puts "Received message #{message.payload}"
