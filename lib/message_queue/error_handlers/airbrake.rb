@@ -9,7 +9,7 @@ if defined?(Airbrake)
       class Airbrake
         def handle(message, consumer, ex)
           params = message.attributes.merge(:pid => Process.pid, :consumer => consumer.inspect)
-          Airbrake.notify_or_ignore(ex, :parameters => params)
+          ::Airbrake.notify_or_ignore(ex, :parameters => params)
         end
       end
     end
