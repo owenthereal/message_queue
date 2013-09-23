@@ -16,8 +16,8 @@ class OptionsHelperTest < Test::Unit::TestCase
     hash[:foo] = :baz
     assert_not_equal new_hash, hash
 
-    hash_with_block = {:foo => ->() {:bar} }
+    hash_with_block = {:foo => { :bar => ->() {:baz} } }
     new_hash = obj.deep_clone(hash_with_block)
-    assert_equal new_hash, {:foo => :bar}
+    assert_equal new_hash, {:foo => { :bar => :baz }}
   end
 end
