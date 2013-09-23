@@ -22,14 +22,14 @@ class MessageQueue::Connection
   #
   # Returns nothing
   def connect
-    logger.info("connecting with adapter #{self.class} and settings #{settings}")
+    logger.info("Connecting to message queue with adapter #{self.class} and settings #{settings}")
   end
 
   # Public: Disconnect from the message queue
   #
   # Returns nothing
   def disconnect
-    logger.info("disconnecting")
+    logger.info("Disconnecting from message queue")
   end
 
   # Public: Check if it's connected to the message queue

@@ -56,7 +56,7 @@ module MessageQueue
                                            :subscribe => self.class.subscribe_options)
       consumer.subscribe(options) do |message|
         begin
-          logger.info("message(#{message.message_id || '-'}): " +
+          logger.info("Message(#{message.message_id || '-'}): " +
                       "routing key: #{message.routing_key}, " +
                       "consumer: #{consumer.class}, " +
                       "payload: #{message.payload}")
