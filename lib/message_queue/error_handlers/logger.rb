@@ -4,7 +4,7 @@ module MessageQueue
       include Logging
 
       def handle(message, consumer, ex)
-        prefix = "message(#{message.message_id || '-'}): "
+        prefix = "Message(#{message.message_id || '-'}): "
         logger.error prefix + "error in consumer '#{consumer}'"
         logger.error prefix + "#{ex.class} - #{ex.message}"
         logger.error (['backtrace:'] + ex.backtrace).join("\n")
