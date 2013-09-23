@@ -59,6 +59,7 @@ module MessageQueue
           logger.info("Message(#{message.message_id || '-'}): " +
                       "routing key: #{message.routing_key}, " +
                       "type: #{message.type}, " +
+                      "timestamp: #{message.timestamp}, " +
                       "consumer: #{consumer.class}, " +
                       "payload: #{message.payload}")
           process(message)
