@@ -1,12 +1,15 @@
 require "securerandom"
+require "message_queue/options_helper"
 
 module MessageQueue
   class Producer
+    include OptionsHelper
+
     attr_reader :connection, :options
 
     def initialize(connection, options = {})
       @connection = connection
-      @options = Marshal.load(Marshal.dump(options)) # deep cloning options
+      @options = deep_clone(options)
     end
 
     def dump_object(object)
