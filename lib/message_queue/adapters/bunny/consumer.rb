@@ -66,6 +66,6 @@ class MessageQueue::Adapters::Bunny::Connection::Consumer < MessageQueue::Consum
   private
 
   def channel
-    connection.connection.create_channel
+    @channel ||= connection.connection.create_channel
   end
 end
