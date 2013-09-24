@@ -33,17 +33,21 @@ class MessageQueue::Adapters::Bunny::Connection::Consumer < MessageQueue::Consum
     @exchange_name = exchange_options.delete(:name) || (raise "Missing exchange name")
     @exchange_routing_key = exchange_options.delete(:routing_key) || queue_name
 
-    @subscribe_options = self.options.fetch(:subscribe, {})
+    @subscribe_options = self.options.fetch(:subscribe, {}).merge(:ack => true)
   end
 
   def subscribe(options = {}, &block)
     @subscription = queue.subscribe(subscribe_options.merge(options)) do |delivery_info, metadata, payload|
-      message = MessageQueue::Message.new(:message_id => metadata[:message_id],
-                                          :type => metadata[:type],
-                                          :timestamp => metadata[:timestamp],
-                                          :routing_key => delivery_info[:routing_key],
-                                          :payload => load_object(payload))
-      block.call(message)
+      begin
+        message = MessageQueue::Message.new(:message_id => metadata[:message_id],
+                                            :type => metadata[:type],
+                                            :timestamp => metadata[:timestamp],
+                                            :routing_key => delivery_info[:routing_key],
+                                            :payload => load_object(payload))
+        block.call(message)
+      ensure
+        ack(delivery_info.delivery_tag)
+      end
     end
   end
 
@@ -53,6 +57,10 @@ class MessageQueue::Adapters::Bunny::Connection::Consumer < MessageQueue::Consum
 
   def queue
     @queue ||= channel.queue(queue_name, queue_options).bind(exchange_name, :routing_key => exchange_routing_key)
+  end
+
+  def ack(delivery_tag)
+    channel.ack(delivery_tag, false)
   end
 
   private

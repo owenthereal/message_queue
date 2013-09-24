@@ -36,11 +36,14 @@ module MessageQueue
       end
     end
 
+    def initialize
+      @producer = MessageQueue.new_producer(:exchange => self.class.exchange_options, :message => self.class.message_options)
+    end
+
     def publish(object, options = {})
       logger.info "Publishing #{object.inspect} with options #{options.inspect}"
 
-      producer = MessageQueue.new_producer(:exchange => self.class.exchange_options, :message => self.class.message_options)
-      producer.publish(object, options)
+      @producer.publish(object, options)
     end
   end
 end

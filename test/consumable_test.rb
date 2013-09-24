@@ -19,16 +19,15 @@ class ConsumableTest < Test::Unit::TestCase
     producer = MessageQueue.new_producer(
       :exchange => {
         :name => "test_consumable",
-        :type => :direct
+        :type => :direct,
+        :auto_delete => true
       },
       :message => {
         :routing_key => "test_consumable"
       }
     )
 
-    msg = Time.now.to_s
-
-    Consumer.queue :name => "test_consumable"
+    Consumer.queue :name => "test_consumable", :auto_delete => true
     Consumer.exchange :name => "test_consumable"
     Consumer.send(:define_method, :process) do |message|
       @message = message
@@ -36,9 +35,10 @@ class ConsumableTest < Test::Unit::TestCase
     consumer = Consumer.new
     consumer.subscribe
 
+    msg = Time.now.to_s
     producer.publish msg
 
-    sleep 0.5
+    sleep 1
 
     assert_equal msg, consumer.message.payload
   end

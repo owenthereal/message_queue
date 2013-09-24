@@ -25,7 +25,8 @@ class BunnyTest < Test::Unit::TestCase
       producer = conn.new_producer(
         :exchange => {
           :name => "test_producer",
-          :type => :direct
+          :type => :direct,
+          :auto_delete => true
         },
         :message => {
           :routing_key => "test_producer"
@@ -36,23 +37,41 @@ class BunnyTest < Test::Unit::TestCase
       assert_equal :direct, producer.exchange_type
       assert_equal "test_producer",  producer.message_options[:routing_key]
 
+      ch = connection.connection.create_channel
+      queue = ch.queue("test_producer", :auto_delete => true).bind("test_producer", :routing_key => "test_producer")
+
+      @payload = nil
+      queue.subscribe do |_, _, payload|
+        @payload = payload
+      end
+
       msg = Time.now.to_s
       producer.publish msg
 
-      ch = connection.connection.create_channel
-      queue = ch.queue("test_producer").bind("test_producer", :routing_key => "test_producer")
-      _, _, m = queue.pop
+      sleep 1
 
-      assert_equal msg, m
+      assert_equal msg, @payload
     end
   end
 
   def test_new_consumer
     connection = MessageQueue::Adapters::Bunny.new_connection MessageQueue::Serializers::Plain
     connection.with_connection do |conn|
+      producer = conn.new_producer(
+        :exchange => {
+          :name => "test_consumer",
+          :type => :direct,
+          :auto_delete => true
+        },
+        :message => {
+          :routing_key => "test_consumer"
+        }
+      )
+
       consumer = conn.new_consumer(
         :queue => {
-          :name => "test_consumer"
+          :name => "test_consumer",
+          :auto_delete => true
         },
         :exchange => {
           :name => "test_consumer"
@@ -62,21 +81,17 @@ class BunnyTest < Test::Unit::TestCase
       assert_equal "test_consumer", consumer.queue_name
       assert_equal "test_consumer", consumer.exchange_name
 
-      producer = conn.new_producer(
-        :exchange => {
-          :name => "test_consumer",
-          :type => :direct
-        },
-        :message => {
-          :routing_key => "test_consumer"
-        }
-      )
+      @payload = nil
+      consumer.subscribe do |message|
+        @payload = message.payload
+      end
 
       msg = Time.now.to_s
       producer.publish msg, :type => :foo
 
-      _, _, m = consumer.queue.pop
-      assert_equal msg, m
+      sleep 1
+
+      assert_equal msg, @payload
     end
   end
 end
