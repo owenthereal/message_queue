@@ -50,17 +50,20 @@ module MessageQueue
       end
     end
 
+    def initialize
+      @consumer = MessageQueue.new_consumer(:queue => self.class.queue_options,
+                                            :exchange => self.class.exchange_options,
+                                            :subscribe => self.class.subscribe_options)
+    end
+
     def subscribe(options = {})
-      consumer = MessageQueue.new_consumer(:queue => self.class.queue_options,
-                                           :exchange => self.class.exchange_options,
-                                           :subscribe => self.class.subscribe_options)
-      consumer.subscribe(options) do |message|
+      @consumer.subscribe(options) do |message|
         begin
           logger.info("Message(#{message.message_id || '-'}): " +
                       "routing key: #{message.routing_key}, " +
                       "type: #{message.type}, " +
                       "timestamp: #{message.timestamp}, " +
-                      "consumer: #{consumer.class}, " +
+                      "consumer: #{@consumer.class}, " +
                       "payload: #{message.payload}")
           process(message)
         rescue StandardError => ex
