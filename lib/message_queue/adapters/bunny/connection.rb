@@ -7,7 +7,7 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
   def connect
     @connection ||= begin
                       super
-                      bunny = ::Bunny.new(settings)
+                      bunny = ::Bunny.new(bunny_settings)
                       bunny.start
                       bunny
                     end
@@ -41,6 +41,20 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
     raise "No connection to RabbitMQ" unless connection && connected?
 
     Consumer.new(self, options)
+  end
+
+  private
+
+  def bunny_settings
+    default_bunny_settings.merge(settings)
+  end
+
+  def default_bunny_settings
+    {
+      :heartbeat => 1,
+      :automatically_recover => true,
+      :network_recovery_interval => 1
+    }
   end
 end
 
