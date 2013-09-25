@@ -32,13 +32,13 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
   end
 
   def new_producer(options)
-    raise "No connection to RabbitMQ" unless connection && connected?
+    raise "No connection to RabbitMQ" unless connection
 
     Producer.new(self, options)
   end
 
   def new_consumer(options)
-    raise "No connection to RabbitMQ" unless connection && connected?
+    raise "No connection to RabbitMQ" unless connection
 
     Consumer.new(self, options)
   end
