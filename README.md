@@ -1,6 +1,7 @@
 # MessageQueue
 
-A common interface to multiple message queues libraries.
+A common interface to multiple message queues libraries. Think of it as the
+ORM to message queues.
 
 ## Installation
 
@@ -15,6 +16,17 @@ And then execute:
 Or install it yourself as:
 
     $ gem install message_queue
+
+## Adapters
+
+* In memory through [Observable](http://www.ruby-doc.org/stdlib-2.0.0/libdoc/observer/rdoc/Observable.html)
+* RabbitMQ through [bunny](https://github.com/ruby-amqp/bunny)
+
+## Serializers
+
+* Plain text
+* JSON through [multi_json](https://github.com/intridea/multi_json)
+* Message pack through [msgpack](https://github.com/msgpack/msgpack-ruby)
 
 ## Usage
 
@@ -96,9 +108,9 @@ puts MessageQueue.connected? # => false
 ```
 
 You could also mix in the `MessageQueue::Producible` module and the
-`MessageQueue::Consumable` module to your producer class and consumer
-class respectively. The consumer class needs to implement a `process`
-method which will be passed a `MessageQueue::Message` instance when it
+`MessageQueue::Consumable` module to your producer and consumer
+respectively. The consumer needs to implement a `process`
+method which will be passed a `MessageQueue::Message` object when it
 receives a message.
 
 ```ruby
@@ -136,8 +148,7 @@ See [examples](https://github.com/jingweno/message_queue/tree/master/examples).
 
 For Rails, `message_queue` automatically loads settings from
 `RAILS_ROOT/config/message_queue.yml`. If the file doesn't exist, it
-initializes the queue in
-[memory](https://github.com/jingweno/message_queue/tree/master/lib/message_queue/adapters/memory) mode.
+initializes the queue with in-memory mode.
 
 ## Contributing
 
