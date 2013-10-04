@@ -67,7 +67,7 @@ module MessageQueue
                       "payload: #{message.payload}")
           process(message)
         rescue StandardError => ex
-          handle_error(message, consumer, ex)
+          handle_error(message, @consumer, ex)
         end
       end
     end
