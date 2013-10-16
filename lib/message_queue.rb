@@ -29,7 +29,7 @@ module MessageQueue
       file_or_options = YAML.load_file(file_or_options).inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
 
-    @settings = file_or_options
+    @settings = file_or_options.to_hash
     @connection = new_connection(@settings)
     @connection.connect
   end
@@ -74,6 +74,7 @@ module MessageQueue
   # Returns the connection for the specified message queue.
   # Raises a RuntimeError if an adapter can't be found.
   def new_connection(options = {})
+    options = options.to_hash
     adapter = load_adapter(options[:adapter])
     raise "Missing adapter #{options[:adapter]}" unless adapter
 
@@ -94,6 +95,7 @@ module MessageQueue
   # Returns nothing
   # Raises a RuntimeError if an adapter can't be found.
   def with_connection(options = {}, &block)
+    options = options.to_hash
     connection = new_connection(options)
     connection.with_connection(&block)
   end
@@ -104,6 +106,7 @@ module MessageQueue
   #
   # Returns a new producer
   def new_producer(options = {})
+    options = options.to_hash
     connection.new_producer(options)
   end
 
@@ -113,6 +116,7 @@ module MessageQueue
   #
   # Returns a new consumer
   def new_consumer(options = {})
+    options = options.to_hash
     connection.new_consumer(options)
   end
 
