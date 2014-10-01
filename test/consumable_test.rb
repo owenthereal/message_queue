@@ -1,3 +1,4 @@
+# encoding: utf-8
 require_relative "test_helper"
 
 class ConsumableTest < Test::Unit::TestCase
@@ -35,11 +36,12 @@ class ConsumableTest < Test::Unit::TestCase
     consumer = Consumer.new
     consumer.subscribe
 
-    msg = Time.now.to_s
+    msg = Time.now.to_s + '™'
     producer.publish msg
 
     sleep 1
 
     assert_equal msg, consumer.message.payload
+    assert_equal "UTF-8", "#{consumer.message.payload.encoding}".upcase
   end
 end
