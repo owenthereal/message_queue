@@ -59,6 +59,8 @@ module MessageQueue
     def subscribe(options = {})
       @consumer.subscribe(options) do |message|
         begin
+          # message.routing_key randomly becomes encoded in ASCII-8BIT which causes the following:
+          # Encoding::CompatibilityError - incompatible character encodings: ASCII-8BIT and UTF-8
           message.routing_key.force_encoding("UTF-8")
           logger.info("Message(#{message.message_id || '-'}): " +
                       "routing key: #{message.routing_key}, " +
