@@ -59,6 +59,7 @@ module MessageQueue
     def subscribe(options = {})
       @consumer.subscribe(options) do |message|
         begin
+          message.routing_key.force_encoding("UTF-8")
           logger.info("Message(#{message.message_id || '-'}): " +
                       "routing key: #{message.routing_key}, " +
                       "type: #{message.type}, " +
