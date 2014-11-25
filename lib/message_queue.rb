@@ -136,6 +136,7 @@ module MessageQueue
   # Returns the registered error handlers.
   #
   # message_queue uses the following error handler types:
+  #  - :connection for producer error trying to connect to rabbitmq server.
   #  - :message for consumer errors during handling message
   def register_error_handler(type, error_handler)
     @error_handlers ||= {}

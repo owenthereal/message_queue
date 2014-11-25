@@ -2,7 +2,38 @@ require_relative "../test_helper"
 require_relative "../../lib/message_queue/serializers/plain"
 require_relative "../../lib/message_queue/adapters/bunny"
 
+class ErrorBunny < MessageQueue::Adapters::Bunny
+  class ErrorBunnyConnection < MessageQueue::Adapters::Bunny::Connection
+    def self.bunny_adapter_class
+      ErrorBunnyAdapter
+    end
+  end
+
+  class ErrorBunnyAdapter
+    def initialize(*)
+    end
+
+    def start
+      raise 'Connection error!'
+    end
+  end
+
+  def new_connection(serializer, settings)
+    ErrorBunnyConnection.new(serializer, settings)
+  end
+end
+
 class BunnyTest < Test::Unit::TestCase
+  def setup
+    @original_logger = MessageQueue::Logging.logger
+    @test_logger = TestLogger.new
+    MessageQueue::Logging.logger = @test_logger
+  end
+
+  def teardown
+    MessageQueue::Logging.logger = @original_logger
+  end
+
   def test_new_connection
     connection = MessageQueue::Adapters::Bunny.new_connection(
       MessageQueue::Serializers::Plain,
@@ -93,5 +124,12 @@ class BunnyTest < Test::Unit::TestCase
 
       assert_equal msg, @payload
     end
+  end
+
+  def test_connection_error
+    connection = ErrorBunny.new_connection MessageQueue::Serializers::Plain
+    connection.connect
+
+    assert @test_logger.buffer.include?('Connection error!')
   end
 end

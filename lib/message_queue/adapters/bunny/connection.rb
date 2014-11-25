@@ -7,10 +7,12 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
   def connect
     @connection ||= begin
                       super
-                      bunny = ::Bunny.new(bunny_settings)
+                      bunny = self.class.bunny_adapter_class.new(bunny_settings)
                       bunny.start
                       bunny
                     end
+  rescue => e
+    handle_connection_error(e)
   end
 
   # Public: Disconnect from RabbitMQ
@@ -55,6 +57,16 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
       :automatically_recover => true,
       :network_recovery_interval => 1
     }
+  end
+
+  def handle_connection_error(error)
+    MessageQueue.error_handlers_for(:connection).each do |handler|
+      handler.handle(error)
+    end
+  end
+
+  def self.bunny_adapter_class
+    ::Bunny
   end
 end
 
