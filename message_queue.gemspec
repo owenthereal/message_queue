@@ -19,7 +19,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "bunny"
+  spec.add_development_dependency "bunny", "~> 1.2.0"
   spec.add_development_dependency "msgpack"
   spec.add_development_dependency "multi_json"
+  spec.add_development_dependency "pry"
 end

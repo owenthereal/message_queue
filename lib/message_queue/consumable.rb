@@ -64,7 +64,7 @@ module MessageQueue
           message.routing_key.force_encoding("UTF-8")
           logger.info("Message(#{(message.message_id || '-').force_encoding("UTF-8")}): " +
                       "routing key: #{message.routing_key.force_encoding("UTF-8")}, " +
-                      "type: #{message.type.force_encoding("UTF-8")}, " +
+                      "type: #{message.type.to_s.force_encoding("UTF-8")}, " +
                       "timestamp: #{message.timestamp.to_s.force_encoding("UTF-8")}, " +
                       "consumer: #{@consumer.class.to_s.force_encoding("UTF-8")}, " +
                       "payload: #{message.payload.to_s.force_encoding("UTF-8")}")
