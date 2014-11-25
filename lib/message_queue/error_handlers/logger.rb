@@ -13,4 +13,4 @@ module MessageQueue
   end
 end
 
-MessageQueue.register_error_handler MessageQueue::ErrorHandlers::Logger.new
+MessageQueue.register_error_handler :message, MessageQueue::ErrorHandlers::Logger.new

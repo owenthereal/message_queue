@@ -134,15 +134,16 @@ module MessageQueue
   # Internal: Register a error handler.
   #
   # Returns the registered error handlers.
-  def register_error_handler(error_handler)
-    error_handlers << error_handler
+  def register_error_handler(type, error_handler)
+    error_handlers[type] ||= []
+    error_handlers[type] << error_handler
   end
 
   # Internal: Get the list of error handlers.
   #
   # Returns the list of error handlers.
   def error_handlers
-    @error_handlers ||= []
+    @error_handlers ||= {}
   end
 
   # Internal: Get the list of consumables.
