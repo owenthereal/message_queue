@@ -78,9 +78,7 @@ module MessageQueue
     private
 
     def handle_error(message, consumer, ex)
-      return unless handlers = MessageQueue.error_handlers[:message]
-
-      handlers.each do |handler|
+      MessageQueue.error_handlers_for(:message).each do |handler|
         handler.handle(message, consumer, ex)
       end
     end
