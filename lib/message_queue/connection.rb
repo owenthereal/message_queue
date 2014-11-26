@@ -32,6 +32,15 @@ class MessageQueue::Connection
     logger.info("Disconnecting from message queue")
   end
 
+  # Public: Disconnect and re-connect to the message queue
+  #
+  # Returns nothing
+  def reconnect
+
+    disconnect
+    connect
+  end
+
   # Public: Check if it's connected to the message queue
   #
   # Returns true if it's connected

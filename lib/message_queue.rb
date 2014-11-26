@@ -29,7 +29,7 @@ module MessageQueue
       file_or_options = YAML.load_file(file_or_options).inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
 
-    @settings = file_or_options.to_hash
+    @settings = file_or_options
     @connection = new_connection(@settings)
     @connection.connect
   end
@@ -74,7 +74,6 @@ module MessageQueue
   # Returns the connection for the specified message queue.
   # Raises a RuntimeError if an adapter can't be found.
   def new_connection(options = {})
-    options = options.to_hash
     adapter = load_adapter(options[:adapter])
     raise "Missing adapter #{options[:adapter]}" unless adapter
 
@@ -95,7 +94,6 @@ module MessageQueue
   # Returns nothing
   # Raises a RuntimeError if an adapter can't be found.
   def with_connection(options = {}, &block)
-    options = options.to_hash
     connection = new_connection(options)
     connection.with_connection(&block)
   end
@@ -106,7 +104,6 @@ module MessageQueue
   #
   # Returns a new producer
   def new_producer(options = {})
-    options = options.to_hash
     connection.new_producer(options)
   end
 
@@ -116,7 +113,6 @@ module MessageQueue
   #
   # Returns a new consumer
   def new_consumer(options = {})
-    options = options.to_hash
     connection.new_consumer(options)
   end
 
@@ -138,15 +134,19 @@ module MessageQueue
   # Internal: Register a error handler.
   #
   # Returns the registered error handlers.
-  def register_error_handler(error_handler)
-    error_handlers << error_handler
+  #
+  # message_queue uses the following error handler types:
+  #  - :connection for producer error trying to connect to rabbitmq server.
+  #  - :message for consumer errors during handling message
+  def register_error_handler(type, error_handler)
+    @error_handlers ||= {}
+    @error_handlers[type] ||= []
+    @error_handlers[type] << error_handler
   end
 
-  # Internal: Get the list of error handlers.
-  #
-  # Returns the list of error handlers.
-  def error_handlers
-    @error_handlers ||= []
+  # Internal: Returns an error handler for given type.
+  def error_handlers_for(type)
+    @error_handlers[type] || []
   end
 
   # Internal: Get the list of consumables.
