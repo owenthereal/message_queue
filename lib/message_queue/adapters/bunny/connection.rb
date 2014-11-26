@@ -13,6 +13,8 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
                     end
   rescue => e
     handle_connection_error(e)
+
+    false
   end
 
   # Public: Disconnect from RabbitMQ
@@ -33,9 +35,13 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
     @connection.open? if @connection
   end
 
-  def new_producer(options)
-    raise "No connection to RabbitMQ" unless connection
+  def verify_connection
+    reconnect unless connected?
 
+    connected?
+  end
+
+  def new_producer(options)
     Producer.new(self, options)
   end
 
@@ -43,6 +49,12 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
     raise "No connection to RabbitMQ" unless connection
 
     Consumer.new(self, options)
+  end
+
+  def handle_connection_error(error)
+    MessageQueue.error_handlers_for(:connection).each do |handler|
+      handler.handle(error)
+    end
   end
 
   private
@@ -57,12 +69,6 @@ class MessageQueue::Adapters::Bunny::Connection < MessageQueue::Connection
       :automatically_recover => true,
       :network_recovery_interval => 1
     }
-  end
-
-  def handle_connection_error(error)
-    MessageQueue.error_handlers_for(:connection).each do |handler|
-      handler.handle(error)
-    end
   end
 
   def self.bunny_adapter_class
