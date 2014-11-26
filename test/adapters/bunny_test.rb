@@ -2,7 +2,65 @@ require_relative "../test_helper"
 require_relative "../../lib/message_queue/serializers/plain"
 require_relative "../../lib/message_queue/adapters/bunny"
 
+class ErrorBunny < MessageQueue::Adapters::Bunny
+  class ErrorBunnyConnection < MessageQueue::Adapters::Bunny::Connection
+    class << self
+      attr_accessor :bunny_adapter_class
+    end
+  end
+
+  class ErrorBunnyAdapter
+    def initialize(*)
+    end
+
+    def start
+      raise 'Connection error!'
+    end
+  end
+
+  def new_connection(serializer, settings)
+    ErrorBunnyConnection.new(serializer, settings)
+  end
+end
+
 class BunnyTest < Test::Unit::TestCase
+  def setup
+    start_test_logger
+  end
+
+  def teardown
+    stop_test_logger
+  end
+
+  def producer_config
+    {
+      :exchange => {
+        :name => "test_exchange",
+        :type => :direct,
+        :auto_delete => true
+      },
+      :message => {
+        :routing_key => "test_queue"
+      }
+    }
+  end
+
+  def consumer_config
+    {
+      :exchange => {
+        :name => "test_exchange"
+      },
+      :queue => {
+        :name => "test_queue",
+        :auto_delete => true
+      }
+    }
+  end
+
+  def connection_error_str
+    'Connection error!'
+  end
+
   def test_new_connection
     connection = MessageQueue::Adapters::Bunny.new_connection(
       MessageQueue::Serializers::Plain,
@@ -22,23 +80,14 @@ class BunnyTest < Test::Unit::TestCase
   def test_new_producer
     connection = MessageQueue::Adapters::Bunny.new_connection MessageQueue::Serializers::Plain
     connection.with_connection do |conn|
-      producer = conn.new_producer(
-        :exchange => {
-          :name => "test_producer",
-          :type => :direct,
-          :auto_delete => true
-        },
-        :message => {
-          :routing_key => "test_producer"
-        }
-      )
+      producer = conn.new_producer(producer_config)
 
-      assert_equal "test_producer", producer.exchange_name
+      assert_equal "test_exchange", producer.exchange_name
       assert_equal :direct, producer.exchange_type
-      assert_equal "test_producer",  producer.message_options[:routing_key]
+      assert_equal "test_queue",  producer.message_options[:routing_key]
 
       ch = connection.connection.create_channel
-      queue = ch.queue("test_producer", :auto_delete => true).bind("test_producer", :routing_key => "test_producer")
+      queue = ch.queue("test_producer", :auto_delete => true).bind("test_exchange", :routing_key => "test_queue")
 
       @payload = nil
       queue.subscribe do |_, _, payload|
@@ -57,29 +106,11 @@ class BunnyTest < Test::Unit::TestCase
   def test_new_consumer
     connection = MessageQueue::Adapters::Bunny.new_connection MessageQueue::Serializers::Plain
     connection.with_connection do |conn|
-      producer = conn.new_producer(
-        :exchange => {
-          :name => "test_consumer",
-          :type => :direct,
-          :auto_delete => true
-        },
-        :message => {
-          :routing_key => "test_consumer"
-        }
-      )
+      producer = conn.new_producer(producer_config)
+      consumer = conn.new_consumer(consumer_config)
 
-      consumer = conn.new_consumer(
-        :queue => {
-          :name => "test_consumer",
-          :auto_delete => true
-        },
-        :exchange => {
-          :name => "test_consumer"
-        }
-      )
-
-      assert_equal "test_consumer", consumer.queue_name
-      assert_equal "test_consumer", consumer.exchange_name
+      assert_equal "test_queue", consumer.queue_name
+      assert_equal "test_exchange", consumer.exchange_name
 
       @payload = nil
       consumer.subscribe do |message|
@@ -92,6 +123,41 @@ class BunnyTest < Test::Unit::TestCase
       sleep 1
 
       assert_equal msg, @payload
+    end
+  end
+
+  def test_connection_error
+    connection = ErrorBunny.new_connection MessageQueue::Serializers::Plain
+    connection.connect
+
+    assert @test_logger.buffer.include?(connection_error_str)
+  end
+
+  def test_connection_error_custom_handler
+    test_handler = TestConnectionHandler.new
+    MessageQueue.register_error_handler :connection, test_handler
+
+    connection = ErrorBunny.new_connection MessageQueue::Serializers::Plain
+    connection.connect
+
+    assert test_handler.buffer.include?(connection_error_str)
+  end
+
+  def test_verify_connection
+    msg = Time.now.to_s
+
+    connection = ErrorBunny.new_connection MessageQueue::Serializers::Plain
+    connection.with_connection do |conn|
+      producer = conn.new_producer(producer_config)
+      refute producer.publish(msg)
+      assert @test_logger.buffer.include?(connection_error_str)
+
+      ErrorBunny::ErrorBunnyConnection.bunny_adapter_class = ::Bunny
+      @test_logger.buffer.clear
+
+      producer = conn.new_producer(producer_config)
+      assert producer.publish(msg)
+      refute @test_logger.buffer.include?(connection_error_str)
     end
   end
 end

@@ -134,15 +134,19 @@ module MessageQueue
   # Internal: Register a error handler.
   #
   # Returns the registered error handlers.
-  def register_error_handler(error_handler)
-    error_handlers << error_handler
+  #
+  # message_queue uses the following error handler types:
+  #  - :connection for producer error trying to connect to rabbitmq server.
+  #  - :message for consumer errors during handling message
+  def register_error_handler(type, error_handler)
+    @error_handlers ||= {}
+    @error_handlers[type] ||= []
+    @error_handlers[type] << error_handler
   end
 
-  # Internal: Get the list of error handlers.
-  #
-  # Returns the list of error handlers.
-  def error_handlers
-    @error_handlers ||= []
+  # Internal: Returns an error handler for given type.
+  def error_handlers_for(type)
+    @error_handlers[type] || []
   end
 
   # Internal: Get the list of consumables.

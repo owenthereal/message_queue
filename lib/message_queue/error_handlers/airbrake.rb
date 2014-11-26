@@ -15,5 +15,5 @@ if defined?(Airbrake)
     end
   end
 
-  MessageQueue.register_error_handler MessageQueue::ErrorHandlers::Airbrake.new
+  MessageQueue.register_error_handler :message, MessageQueue::ErrorHandlers::Airbrake.new
 end
