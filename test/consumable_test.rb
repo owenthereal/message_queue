@@ -8,16 +8,15 @@ class ConsumableTest < Test::Unit::TestCase
   end
 
   def setup
-    @original_logger = MessageQueue::Logging.logger
-    @test_logger = TestLogger.new
-    MessageQueue::Logging.logger = @test_logger
+    start_test_logger
 
     MessageQueue.connect(:adapter => :bunny, :serializer => :plain)
   end
 
   def teardown
     MessageQueue.disconnect
-    MessageQueue::Logging.logger = @original_logger
+
+    stop_test_logger
   end
 
   def build_producer
@@ -87,7 +86,7 @@ class ConsumableTest < Test::Unit::TestCase
   end
 
   def test_consumable_custom_error_handler
-    test_handler = TestHandler.new
+    test_handler = TestMessageHandler.new
     MessageQueue.register_error_handler :message, test_handler
 
     configure_invalid_consumer
@@ -104,7 +103,7 @@ class ConsumableTest < Test::Unit::TestCase
   end
 
   def test_consumable_does_not_use_unrelated_handler_types
-    test_handler = TestHandler.new
+    test_handler = TestMessageHandler.new
     MessageQueue.register_error_handler :connection, test_handler
 
     configure_invalid_consumer

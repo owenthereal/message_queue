@@ -25,15 +25,11 @@ end
 
 class BunnyTest < Test::Unit::TestCase
   def setup
-    @original_logger = MessageQueue::Logging.logger
-    @test_logger = TestLogger.new
-    MessageQueue::Logging.logger = @test_logger
-
-    ErrorBunny::ErrorBunnyConnection.bunny_adapter_class = ErrorBunny::ErrorBunnyAdapter
+    start_test_logger
   end
 
   def teardown
-    MessageQueue::Logging.logger = @original_logger
+    stop_test_logger
   end
 
   def producer_config
@@ -59,6 +55,10 @@ class BunnyTest < Test::Unit::TestCase
         :auto_delete => true
       }
     }
+  end
+
+  def connection_error_str
+    'Connection error!'
   end
 
   def test_new_connection
@@ -130,25 +130,34 @@ class BunnyTest < Test::Unit::TestCase
     connection = ErrorBunny.new_connection MessageQueue::Serializers::Plain
     connection.connect
 
-    assert @test_logger.buffer.include?('Connection error!')
+    assert @test_logger.buffer.include?(connection_error_str)
+  end
+
+  def test_connection_error_custom_handler
+    test_handler = TestConnectionHandler.new
+    MessageQueue.register_error_handler :connection, test_handler
+
+    connection = ErrorBunny.new_connection MessageQueue::Serializers::Plain
+    connection.connect
+
+    assert test_handler.buffer.include?(connection_error_str)
   end
 
   def test_verify_connection
     msg = Time.now.to_s
-    error_string = 'Connection error!'
 
     connection = ErrorBunny.new_connection MessageQueue::Serializers::Plain
     connection.with_connection do |conn|
       producer = conn.new_producer(producer_config)
       refute producer.publish(msg)
-      assert @test_logger.buffer.include?(error_string)
+      assert @test_logger.buffer.include?(connection_error_str)
 
       ErrorBunny::ErrorBunnyConnection.bunny_adapter_class = ::Bunny
       @test_logger.buffer.clear
 
       producer = conn.new_producer(producer_config)
       assert producer.publish(msg)
-      refute @test_logger.buffer.include?(error_string)
+      refute @test_logger.buffer.include?(connection_error_str)
     end
   end
 end
