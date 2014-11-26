@@ -23,7 +23,6 @@ class MessageQueue::Adapters::Bunny::Connection::Producer < MessageQueue::Produc
   def initialize(connection, options = {})
     super
 
-    @connection = connection
     @exchange_options = self.options.fetch(:exchange)
     @exchange_name = exchange_options.delete(:name) || (raise "Missing exchange name")
     @exchange_type = exchange_options.delete(:type) || (raise "Missing exchange type")
