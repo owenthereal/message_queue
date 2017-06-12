@@ -4,7 +4,7 @@ module MessageQueue
 
     config_file = ::Rails.root.join("config", "message_queue.yml")
     config = if config_file.exist?
-               HashWithIndifferentAccess.new YAML.load_file(config_file)[::Rails.env]
+               HashWithIndifferentAccess.new YAML.load(ERB.new(File.read(config_file)).result)[::Rails.env]
              else
                { :adapter => :memory, :serializer => :json }
              end
