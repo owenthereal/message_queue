@@ -34,6 +34,13 @@ module MessageQueue
     @connection.connect
   end
 
+  def connection
+    # AD-3192 - hook_rails! does not always get called for some reason.
+    # I won't investigate further since we'll be migrating to the message bus soon.
+    hook_rails! unless @connection
+    @connection
+  end
+
   # Public: Disconnect from the message queue if it's connected
   #
   # It clears out the stored connection.
