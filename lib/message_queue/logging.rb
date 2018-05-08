@@ -26,5 +26,10 @@ module MessageQueue
     def logger
       Logging.logger
     end
+
+    def log_exception(ex)
+      logger.error "#{self.class.name} Error: #{ex.class} - #{ex.message}"
+      logger.error (['backtrace:'] + ex.backtrace).join("\n")
+    end
   end
 end
